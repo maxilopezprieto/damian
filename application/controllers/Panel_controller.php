@@ -1,5 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+include ('class/cliente.class.php');
 
 class Panel_controller extends CI_Controller {
     
@@ -72,35 +73,156 @@ class Panel_controller extends CI_Controller {
         $this->load->view("nav");
         $this->load->view("index");
         $this->load->view("footer");
+    }
 
-    }
-    
-    public function alta(){
-        $this->control();
-        /*
-        $clave = $this->input->post('clave');
-        $config = $this->creaObjeto($clave);
-        $this->form_validation->set_rules($config->getRules());
-        if ($this->form_validation->run()){
-            $this->load->model('mail_model');
-            $config->setParams($this->input->post());
-            $dato = $config->hasheo();
-            $this->mail_model->agregar($dato);
-            $this->session->set_flashdata('success', 'La configuración de mail fue agregada con éxito');
-            $this->log("Se ha dado de alta: ".$clave);
-            redirect('admin_controller/panelMail');
-        } else {
-            $this->panelMail();
-        }*/
-    }
-    
+//-CLIENTES        
     public function clientes(){
+        $this->control();
+        $data = array();
+        $data['success'] = $this->session->flashdata('success');
+        $data['error'] = $this->session->flashdata('error');
+        $data['undo'] = $this->session->flashdata('undo');
+        $data['clientes'] = $this->panel_model->listarClientes();
+        $this->load->view("header");
+        $this->load->view("nav");
+        $this->load->view("clientes/clientes", $data);
+        $this->load->view("footer");        
+    }
+    
+//-ALTA
+    public function altaCliente(){
         $this->control();
         $this->load->view("header");
         $this->load->view("nav");
-        $this->load->view("clientes");
+        $this->load->view("clientes/alta");
+        $this->load->view("footer");            
+    }
+    
+    public function doAltaCliente(){
+        $this->control();
+        $cliente = new Cliente();
+        $this->form_validation->set_rules($cliente->getRules());
+        if ($this->form_validation->run()){
+            $cliente->setParams($this->input->post());
+            $this->panel_model->alta($cliente);
+            $this->session->set_flashdata('success', 'El cliente fue dado de alta con éxito');
+            redirect('panel_controller/clientes');
+        }else{
+            $this->altaCliente();
+        }
+    }
+
+//-VER        
+    public function verCliente(){
+        $this->control();
+        if ($this->input->get('id')){
+            $id = $this->input->get('id');
+        } else {
+            $id = set_value('id');
+        }
+        $cliente = $this->controlId($id);
+        if (empty($cliente)){
+            $this->session->set_flashdata('error', 'Error: El cliente no existe');
+            redirect('panel_controller/clientes');
+        }
+        $data = array();
+        $data['cliente'] = $this->controlId($id);
+        $data['mascotas'] = $this->panel_model->buscarMascotas($id);
+        
+        $this->load->view("header");
+        $this->load->view("nav");
+        $this->load->view("clientes/ver", $data);
         $this->load->view("footer");        
     }
+ 
+//-EDITAR       
+    public function doeditarCliente(){
+        $this->control();
+        $id = $this->input->post('id');
+        $cliente = $this->controlId($id);
+        if (empty($cliente)){
+            $this->session->set_flashdata('error', 'doEditarCliente: El cliente no existe');
+            redirect('panel_controller/clientes');
+        }
+        $cliente = new Cliente();
+        $this->form_validation->set_rules($cliente->getRules());
+        if ($this->form_validation->run()){
+            $cliente->setParams($this->input->post());
+            $this->panel_model->editar('clientes', $cliente);
+            $this->session->set_flashdata('success', 'El cliente '.$id.' fue editado con éxito');
+            redirect('panel_controller/clientes');
+            }else{
+                $this->verCliente();
+            }
+    }
+
+//-BAJA    
+    public function bajaLogica(){
+        $this->control();
+        $id = $this->input->get('id');
+        try{
+            $cliente = $this->controlId($id);
+            $this->session->set_flashdata('undo', 'Seguro desea eliminar el cliente '.$id.'? <a href="doBajaLogica?id='.$id.'">Si </a> <a href="clientes">No</a>');
+        }catch (Exception $e){
+            echo $e->getMessage();
+        }
+        redirect('panel_controller/clientes');
+    }
+    
+    public function doBajaLogica(){
+        $this->control();
+        $id = $this->input->get('id');
+        try{
+            $cliente = $this->controlId($id);
+            $cliente->activo = 0;
+            $this->panel_model->editar('clientes', $cliente);
+            $this->session->set_flashdata('success', 'El cliente fue eliminado');        
+        }catch (Exception $e){
+            echo $e->getMessage();
+        }
+        redirect('panel_controller/clientes');           
+    }    
+  
+//-AUXILIARES  
+    public function controlId($id){
+        $cliente = $this->panel_model->buscarCliente($id);
+        return $cliente;
+    }
+    
+
+    
+
+    
+    /* DESHACER
+    public function deshacer(){
+        $this->control();
+        $id = $this->input->get('id');
+        try{
+            $cliente = $this->controlId($id);
+            $cliente->activo = 1;
+            $this->panel_model->editar('clientes', $cliente);
+            $this->session->set_flashdata('success', 'El cliente fue recuperado');        
+        }catch (Exception $e){
+            echo $e->getMessage();
+        }
+        redirect('panel_controller/clientes');               
+    }*/
+    
+    /* BAJA FISICA A IMPLEMENTAR
+    public function doEliminarCliente(){
+        $this->control();
+        $id = $this->input->get('id');
+        try{
+            $this->panel_model->eliminarCliente($id);
+            $this->session->set_flashdata('success', 'El cliente fue eliminado con éxito');
+        }catch (Exception $e){
+            $this->session->set_flashdata('error', $e->getMessage());
+        }
+        redirect('panel_controller/clientes');
+    }
+     */
+    
+//-MASCOTAS
     
     public function mascotas(){
         $this->control();
@@ -109,6 +231,10 @@ class Panel_controller extends CI_Controller {
         $this->load->view("mascotas");
         $this->load->view("footer");        
     }
+    
+    
+    
+//ARTICULOS
     
     public function articulos(){
         $this->control();
