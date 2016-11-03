@@ -28,3 +28,4 @@ user_guide_src/cilexer/pycilexer.egg-info/*
 *.class
 *.pyc
 *.pyo
+application/config/*
