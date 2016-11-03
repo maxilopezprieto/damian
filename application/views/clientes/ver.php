@@ -68,7 +68,7 @@
                                     <td><?php echo $mascota->nRaza?></td>
                                     <td><?php echo $mascota->obs?></td>
                                     <td>
-                                        <a button href="verCliente?id=<?php echo $cliente->id?>" type="button" class="btn btn-primary" aria-label="Left Align">
+                                        <a button href="verMascota?id=<?php echo $mascota->id?>" type="button" class="btn btn-primary" aria-label="Left Align">
                                         <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
                                         </button>
                                     </td>
@@ -129,11 +129,13 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <?php foreach ($ventas as $venta){ ?>
                                 <tr>
-                                    <td><span class="label label-success">01/10/16</span></td>
-                                    <td>Abono 3x2</td>
-                                    <td>$ 300</td>
+                                    <td><span class="label label-success"><?php echo $venta->fecha?></span></td>
+                                    <td><?php echo $venta->nArticulo?></td>
+                                    <td><?php echo $venta->precio?></td>
                                 </tr>
+                                <?php } ?>
                             </tbody>
                         </table>
                     </div>

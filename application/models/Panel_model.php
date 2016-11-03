@@ -16,9 +16,10 @@ class Panel_model extends CI_Model {
       return $resultado;
    }
     
-    public function alta($objeto){
-        $this->db->insert('clientes', $objeto);
+    public function alta($objeto, $tabla){
+        $this->db->insert($tabla, $objeto);
     }
+    
     
     public function listarClientes(){
         $this->db->select('id, nombre, direccion, telefono, celular, activo');
@@ -29,20 +30,63 @@ class Panel_model extends CI_Model {
     }
     
     public function listarMascotas(){
-        $this->db->select('id, idCliente, nombre, raza');
-        $this->db->from('mascota');
+        $this->db->select('mascota.id, idCliente, mascota.nombre as mNombre, raza.nombre as nRaza, obs');
+        $this->db->from('mascota, raza');
+        $this->db->where('mascota.idRaza = raza.id');
         $consulta = $this->db->get();
         return $consulta->result(); 
     }
     
+    public function listarRazas(){
+        $this->db->select('id, nombre, medida');
+        $this->db->from('raza');
+        $consulta = $this->db->get();
+        return $consulta->result();
+    }
+    
+    public function listarArticulos(){
+        $this->db->select('id, nombre, descripcion, precio');
+        $this->db->from('articulos');
+        $this->db->where('activo', 1);
+        $consulta = $this->db->get();
+        return $consulta->result();        
+    }
+
+    public function listarVentas(){
+        $this->db->select('ventas.id as idVenta, idCliente, articulos.nombre as nArticulo, fecha, cantidad, articulos.precio as precio');
+        $this->db->from('ventas, articulos');
+        $this->db->where('ventas.idArticulo = articulos.id');
+        $consulta = $this->db->get();
+        return $consulta->result();        
+    }
+    
     public function buscarMascotas($idCliente){
-        $this->db->select('mascota.nombre as nMascota, raza.nombre as nRaza, obs');
+        $this->db->select('mascota.id, mascota.idCliente, mascota.nombre as nMascota, raza.nombre as nRaza, obs');
         $this->db->from('mascota, raza');
         $this->db->where('idCliente', $idCliente);
         $this->db->where('mascota.idRaza = raza.id');
         $consulta = $this->db->get();
         return $consulta->result(); 
-    }    
+    }
+    
+    public function buscarVentas($idCliente){
+        $this->db->select('ventas.id, ventas.idCliente, articulos.nombre as nArticulo, ventas.fecha, ventas.cantidad, articulos.precio as precio');
+        $this->db->from('ventas, articulos');
+        $this->db->where('idCliente', $idCliente);
+        $this->db->where('ventas.idArticulo = articulos.id');
+        $consulta = $this->db->get();
+        return $consulta->result(); 
+    }
+    
+    public function buscarMascota($id){
+        $this->db->select('mascota.id, mascota.idCliente, mascota.nombre as nMascota, raza.nombre as nRaza, mascota.idRaza idRaza, obs');
+        $this->db->from('mascota, raza');
+        $this->db->where('mascota.id', $id);
+        $this->db->where('mascota.idRaza = raza.id');
+        $consulta = $this->db->get();
+        $resultado = $consulta->row();
+        return $resultado;
+    }
     
     public function buscarCliente($id){
         $this->db->select('id, nombre, direccion, telefono, celular, activo');
@@ -53,9 +97,34 @@ class Panel_model extends CI_Model {
         return $resultado;      
     }
     
+    public function buscarArticulo($id){
+        $this->db->select('id, nombre, descripcion, precio, activo');
+        $this->db->from('articulos');
+        $this->db->where('id', $id);
+        $consulta = $this->db->get();
+        $resultado = $consulta->row();
+        return $resultado;      
+    }
+
+    public function buscarVenta($id){
+        $this->db->select('ventas.id as idVentas, clientes.id as idCliente, articulos.id as idArticulo, fecha, cantidad, articulos.precio as precio');
+        $this->db->from('ventas, clientes, articulos');
+        $this->db->where('ventas.idCliente = clientes.id');
+        $this->db->where('ventas.idArticulo = articulos.id');
+        $this->db->where('ventas.id', $id);
+        $consulta = $this->db->get();
+        $resultado = $consulta->row();
+        return $resultado;      
+    }
+    
     public function editar($tabla, $dato){
         $this->db->where('id', $dato->id);
         $this->db->update($tabla, $dato);
+    }
+
+    public function eliminar($tabla, $id){
+        $this->db->where('id', $id);
+        $this->db->delete($tabla);        
     }
     
     /*public function eliminarCliente($id){

@@ -1,6 +1,9 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 include ('class/cliente.class.php');
+include ('class/mascota.class.php');
+include ('class/articulo.class.php');
+include ('class/venta.class.php');
 
 class Panel_controller extends CI_Controller {
     
@@ -104,7 +107,7 @@ class Panel_controller extends CI_Controller {
         $this->form_validation->set_rules($cliente->getRules());
         if ($this->form_validation->run()){
             $cliente->setParams($this->input->post());
-            $this->panel_model->alta($cliente);
+            $this->panel_model->alta($cliente, 'clientes');
             $this->session->set_flashdata('success', 'El cliente fue dado de alta con éxito');
             redirect('panel_controller/clientes');
         }else{
@@ -128,7 +131,7 @@ class Panel_controller extends CI_Controller {
         $data = array();
         $data['cliente'] = $this->controlId($id);
         $data['mascotas'] = $this->panel_model->buscarMascotas($id);
-        
+        $data['ventas'] = $this->panel_model->buscarVentas($id);
         $this->load->view("header");
         $this->load->view("nav");
         $this->load->view("clientes/ver", $data);
@@ -193,7 +196,7 @@ class Panel_controller extends CI_Controller {
     
 
     
-    /* DESHACER
+    /* DESHACER A IMPLEMENTAR
     public function deshacer(){
         $this->control();
         $id = $this->input->get('id');
@@ -222,36 +225,354 @@ class Panel_controller extends CI_Controller {
     }
      */
     
-//-MASCOTAS
+//-MASCOTAS---------------
     
     public function mascotas(){
         $this->control();
+        $data = array();
+        $data['success'] = $this->session->flashdata('success');
+        $data['error'] = $this->session->flashdata('error');
+        $data['undo'] = $this->session->flashdata('undo');
+        $data['mascotas'] = $this->panel_model->listarMascotas();
         $this->load->view("header");
         $this->load->view("nav");
-        $this->load->view("mascotas");
+        $this->load->view("mascotas/mascotas", $data);
+        $this->load->view("footer");       
+    }
+    
+//-ALTA
+    public function altaMascota(){
+        $this->control();
+        $data['razas'] = $this->panel_model->listarRazas();
+        $data['clientes'] = $this->panel_model->listarClientes();
+        $this->load->view("header");
+        $this->load->view("nav");
+        $this->load->view("mascotas/alta", $data);
+        $this->load->view("footer");            
+    }
+    
+    public function doAltaMascota(){
+        $this->control();
+        $mascota = new Mascota();
+        $this->form_validation->set_rules($mascota->getRules());
+        if ($this->form_validation->run()){
+            $mascota->setParams($this->input->post());
+            $this->panel_model->alta($mascota, 'mascota');
+            $this->session->set_flashdata('success', 'La mascota fue dado de alta con éxito');
+            redirect('panel_controller/mascotas');
+        }else{
+            $this->altaMascota();
+        }
+    }
+    
+//-VER        
+    public function verMascota(){
+        $this->control();
+        if ($this->input->get('id')){
+            $id = $this->input->get('id');
+        } else {
+            $id = set_value('id');
+        }
+        $mascota = $this->controlMascota($id);
+        if (empty($mascota)){
+            $this->session->set_flashdata('error', 'Error: La mascota no existe');
+            redirect('panel_controller/mascotas');
+        }
+        $data = array();
+        $data['mascota'] = $this->controlMascota($id);
+        $data['clientes'] = $this->panel_model->listarClientes();
+        $data['razas'] = $this->panel_model->listarRazas();
+        $this->load->view("header");
+        $this->load->view("nav");
+        $this->load->view("mascotas/ver", $data);
+        $this->load->view("footer");        
+    }
+
+//-EDITAR       
+    public function doeditarMascota(){
+        $this->control();
+        $id = $this->input->post('id');
+        $mascota = $this->controlMascota($id);
+        if (empty($mascota)){
+            $this->session->set_flashdata('error', 'doEditarMascota: La mascota no existe');
+            redirect('panel_controller/mascota');
+        }
+        $mascota = new Mascota();
+        $this->form_validation->set_rules($mascota->getRules());
+        if ($this->form_validation->run()){
+            $mascota->setParams($this->input->post());
+            $this->panel_model->editar('mascota', $mascota);
+            $this->session->set_flashdata('success', 'La mascota '.$id.' fue editado con éxito');
+            redirect('panel_controller/mascotas');
+            }else{
+                $this->verMascota();
+            }
+    }
+    
+//-BAJA    
+    public function eliminarMascota(){
+        $this->control();
+        $id = $this->input->get('id');
+        try{
+            $mascota = $this->controlMascota($id);
+            $this->session->set_flashdata('undo', 'Seguro desea eliminar el mascota '.$id.'? <a href="doEliminarMascota?id='.$id.'">Si </a> <a href="mascotas">No</a>');
+        }catch (Exception $e){
+            echo $e->getMessage();
+        }
+        redirect('panel_controller/mascotas');
+    }
+    
+    public function doEliminarMascota(){
+        $this->control();
+        $id = $this->input->get('id');
+        try{
+            $this->controlMascota($id);
+            $this->panel_model->eliminar('mascota', $id);
+            $this->session->set_flashdata('success', 'La mascota fue eliminada');        
+        }catch (Exception $e){
+            echo $e->getMessage();
+        }
+        redirect('panel_controller/mascotas');           
+    }        
+
+//-AUXILIARES
+    public function controlMascota($id){
+        $mascota = $this->panel_model->buscarMascota($id);
+        return $mascota;
+    }    
+    
+//ARTICULOS-------------
+
+    public function articulos(){
+        $this->control();
+        $data = array();
+        $data['success'] = $this->session->flashdata('success');
+        $data['error'] = $this->session->flashdata('error');
+        $data['undo'] = $this->session->flashdata('undo');
+        $data['articulos'] = $this->panel_model->listarArticulos();
+        $this->load->view("header");
+        $this->load->view("nav");
+        $this->load->view("articulos/articulos", $data);
         $this->load->view("footer");        
     }
     
+//-ALTA
     
-    
-//ARTICULOS
-    
-    public function articulos(){
+     public function altaArticulo(){
         $this->control();
         $this->load->view("header");
         $this->load->view("nav");
-        $this->load->view("articulos");
-        $this->load->view("footer");        
-    }   
+        $this->load->view("articulos/alta");
+        $this->load->view("footer");            
+    }
+    
+    public function doAltaArticulo(){
+        $this->control();
+        $articulo = new Articulo();
+        $this->form_validation->set_rules($articulo->getRules());
+        if ($this->form_validation->run()){
+            $articulo->setParams($this->input->post());
+            $this->panel_model->alta($articulo, 'articulos');
+            $this->session->set_flashdata('success', 'El artículo fue dado de alta con éxito');
+            redirect('panel_controller/articulos');
+        }else{
+            $this->altaArticulo();
+        }
+    }
+
+//-VER        
+    public function verArticulo(){
+        $this->control();
+        if ($this->input->get('id')){
+            $id = $this->input->get('id');
+        } else {
+            $id = set_value('id');
+        }
+        $articulo = $this->controlArticulo($id);
+        if (empty($articulo)){
+            $this->session->set_flashdata('error', 'Error: El artículo no existe');
+            redirect('panel_controller/articulos');
+        }
+        $data = array();
+        $data['articulo'] = $articulo;
+        $this->load->view("header");
+        $this->load->view("nav");
+        $this->load->view("articulos/ver", $data);
+        $this->load->view("footer");
+    }
+    
+//-EDITAR       
+    public function doeditarArticulo(){
+        $this->control();
+        $id = $this->input->post('id');
+        $articulo = $this->controlArticulo($id);
+        if (empty($articulo)){
+            $this->session->set_flashdata('error', 'doEditarArticulo: El artículo no existe');
+            redirect('panel_controller/articulos');
+        }
+        $articulo = new Articulo();
+        $this->form_validation->set_rules($articulo->getRules());
+        if ($this->form_validation->run()){
+            $articulo->setParams($this->input->post());
+            $this->panel_model->editar('articulos', $articulo);
+            $this->session->set_flashdata('success', 'El artículo '.$id.' fue editado con éxito');
+            redirect('panel_controller/articulos');
+            }else{
+                $this->verArticulo();
+            }
+    }    
+    
+//-BAJA    
+    public function bajaLogicaArticulo(){
+        $this->control();
+        $id = $this->input->get('id');
+        try{
+            $articulo = $this->controlArticulo($id);
+            $this->session->set_flashdata('undo', 'Seguro desea eliminar el artículo '.$id.'? <a href="doBajaLogicaArticulo?id='.$id.'">Si </a> <a href="articulos">No</a>');
+        }catch (Exception $e){
+            echo $e->getMessage();
+        }
+        redirect('panel_controller/articulos');
+    }
+    
+    public function doBajaLogicaArticulo(){
+        $this->control();
+        $id = $this->input->get('id');
+        try{
+            $articulo = $this->controlArticulo($id);
+            $articulo->activo = 0;
+            $this->panel_model->editar('articulos', $articulo);
+            $this->session->set_flashdata('success', 'El artículo fue eliminado');        
+        }catch (Exception $e){
+            echo $e->getMessage();
+        }
+        redirect('panel_controller/articulos');           
+    }    
+    
+//-AUXILIARES
+    public function controlArticulo($id){
+        $mascota = $this->panel_model->buscarArticulo($id);
+        return $mascota;
+    } 
+
+//-VENTAS---------------    
     
     public function ventas(){
         $this->control();
+        $data = array();
+        $data['success'] = $this->session->flashdata('success');
+        $data['error'] = $this->session->flashdata('error');
+        $data['undo'] = $this->session->flashdata('undo');
+        $data['ventas'] = $this->panel_model->listarVentas();
         $this->load->view("header");
         $this->load->view("nav");
-        $this->load->view("ventas");
-        $this->load->view("footer");        
+        $this->load->view("ventas/ventas", $data);
+        $this->load->view("footer");       
     }
     
+//-ALTA
+    public function altaVenta(){
+        $this->control();
+        $data['articulos'] = $this->panel_model->listarArticulos();
+        $data['clientes'] = $this->panel_model->listarClientes();
+        $this->load->view("header");
+        $this->load->view("nav");
+        $this->load->view("ventas/alta", $data);
+        $this->load->view("footer");            
+    }
+    
+    public function doAltaVenta(){
+        $this->control();
+        $venta = new Venta();
+        $this->form_validation->set_rules($venta->getRules());
+        if ($this->form_validation->run()){
+            $venta->setParams($this->input->post());
+            $this->panel_model->alta($venta, 'ventas');
+            $this->session->set_flashdata('success', 'La venta fue dado de alta con éxito');
+            redirect('panel_controller/ventas');
+        }else{
+            $this->altaVenta();
+        }
+    }
+    
+//-VER        
+    public function verVenta(){
+        $this->control();
+        if ($this->input->get('id')){
+            $id = $this->input->get('id');
+        } else {
+            $id = set_value('id');
+        }
+        $venta = $this->controlVenta($id);
+        if (empty($venta)){
+            $this->session->set_flashdata('error', 'Error: La venta no existe');
+            redirect('panel_controller/ventas');
+        }
+        $data = array();
+        $data['venta'] = $this->controlVenta($id);
+        $data['clientes'] = $this->panel_model->listarClientes();
+        $data['articulos'] = $this->panel_model->listarArticulos();
+        $this->load->view("header");
+        $this->load->view("nav");
+        $this->load->view("ventas/ver", $data);
+        $this->load->view("footer");        
+    }
+
+//-EDITAR       
+    public function doeditarVenta(){
+        $this->control();
+        $id = $this->input->post('id');
+        $venta = $this->controlVenta($id);
+        if (empty($venta)){
+            $this->session->set_flashdata('error', 'doEditarVenta: La venta no existe');
+            redirect('panel_controller/ventas');
+        }
+        $venta = new Venta();
+        $this->form_validation->set_rules($venta->getRules());
+        if ($this->form_validation->run()){
+            $venta->setParams($this->input->post());
+            $this->panel_model->editar('ventas', $venta);
+            $this->session->set_flashdata('success', 'La venta '.$id.' fue editado con éxito');
+            redirect('panel_controller/ventas');
+            }else{
+                $this->verVenta();
+            }
+    }
+    
+//-BAJA    
+    public function eliminarVenta(){
+        $this->control();
+        $id = $this->input->get('id');
+        try{
+            $venta = $this->controlVenta($id);
+            $this->session->set_flashdata('undo', 'Seguro desea eliminar la venta '.$id.'? <a href="doEliminarVenta?id='.$id.'">Si </a> <a href="ventas">No</a>');
+        }catch (Exception $e){
+            echo $e->getMessage();
+        }
+        redirect('panel_controller/ventas');
+    }
+    
+    public function doEliminarVenta(){
+        $this->control();
+        $id = $this->input->get('id');
+        try{
+            $this->controlVenta($id);
+            $this->panel_model->eliminar('ventas', $id);
+            $this->session->set_flashdata('success', 'La venta fue eliminada');        
+        }catch (Exception $e){
+            echo $e->getMessage();
+        }
+        redirect('panel_controller/ventas');           
+    }
+
+//-AUXILIARES
+    public function controlVenta($id){
+        $venta = $this->panel_model->buscarVenta($id);
+        return $venta;
+    }
+    
+
+//-RESERVAS----------------        
     public function reservas(){
         $this->control();
         $this->load->view("header");
