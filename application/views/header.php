@@ -7,3 +7,5 @@
 		<title><DEV>Sistema Damian<DEV></title>
 		<link href="<?php echo base_url(); ?>css/bootstrap.min.css" rel="stylesheet">
 		<link href="<?php echo base_url(); ?>css/offcanvas.css" rel="stylesheet">
+		<link href="<?php echo base_url(); ?>css/datepicker.css" rel="stylesheet">
+		<link href="<?php echo base_url(); ?>js/jquery-ui/jquery-ui.min.css" rel="stylesheet">

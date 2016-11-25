@@ -60,6 +60,20 @@ class Panel_model extends CI_Model {
         return $consulta->result();        
     }
     
+    public function listarReservas($fecha){
+        $desde = $fecha." 00:00:00";
+        $hasta = $fecha." 23:59:59";
+        $this->db->select('reserva.id, reserva.idCliente, clientes.nombre as nCliente, mascota.nombre as nMascota, fecha, hora, clientes.telefono, clientes.celular, articulos.nombre as nArticulo, articulos.precio as pArticulo');
+        $this->db->from('reserva, mascota, clientes, articulos');
+        $this->db->where('reserva.idMascota = mascota.id');
+        $this->db->where('reserva.idCliente = clientes.id');
+        $this->db->where('reserva.idArticulo = articulos.id');
+        $this->db->where('fecha >=', $desde);
+        $this->db->where('fecha <=', $hasta);
+        $consulta = $this->db->get();
+        return $consulta->result();        
+    }
+    
     public function buscarMascotas($idCliente){
         $this->db->select('mascota.id, mascota.idCliente, mascota.nombre as nMascota, raza.nombre as nRaza, obs');
         $this->db->from('mascota, raza');
@@ -74,6 +88,22 @@ class Panel_model extends CI_Model {
         $this->db->from('ventas, articulos');
         $this->db->where('idCliente', $idCliente);
         $this->db->where('ventas.idArticulo = articulos.id');
+        $consulta = $this->db->get();
+        return $consulta->result(); 
+    }
+
+    public function buscarReservas($idCliente, $historial){
+        $this->db->select('reserva.fecha, reserva.hora, articulos.nombre as nArticulo, mascota.nombre as nMascota, estado');
+        $this->db->from('reserva, articulos, mascota');
+        $this->db->where('reserva.idCliente', $idCliente);
+        $this->db->where('reserva.idArticulo = articulos.id');
+        $this->db->where('reserva.idMascota = mascota.id');
+        $desde = date("Y-m-d")." 00:00:00";
+        if ($historial){
+            $this->db->where('fecha <=', $desde);
+        }else{
+            $this->db->where('fecha >=', $desde);    
+            }
         $consulta = $this->db->get();
         return $consulta->result(); 
     }
@@ -115,6 +145,18 @@ class Panel_model extends CI_Model {
         $consulta = $this->db->get();
         $resultado = $consulta->row();
         return $resultado;      
+    }
+    
+    public function buscarReserva($id){
+        $desde = date("Y-m-d")." 00:00:00";
+        $this->db->select('reserva.id, reserva.idCliente, mascota.nombre as nMascota, fecha, hora');
+        $this->db->from('reserva, mascota');
+        $this->db->where('reserva.idMascota = mascota.id');
+        $this->db->where('fecha >=', $desde);
+        $this->db->where('reserva.id', $id);
+        $consulta = $this->db->get();
+        $resultado = $consulta->row();
+        return $resultado;       
     }
     
     public function editar($tabla, $dato){

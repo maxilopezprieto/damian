@@ -1,0 +1,1 @@
+<?php echo json_encode($clientesJSON, JSON_UNESCAPED_UNICODE );?>

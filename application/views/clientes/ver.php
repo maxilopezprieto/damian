@@ -81,12 +81,34 @@
                         <h4>Próximos Turnos</h4>
                         <table class="table table-striped">
                             <tbody>
+                                <?php foreach ($reservas as $reserva) {?>
                                 <tr>
-                                    <td><span class="label label-info">30/10/16</span></td>
-                                    <td>14:00</td>
-                                    <td>Corte</td>
-                                    <td>"Bobby"</td>
+                                    <td><span class="label label-info"><?php echo $reserva->fecha?></span></td>
+                                    <td><?php echo $reserva->hora?></td>
+                                    <td><?php echo $reserva->nArticulo?></td>
+                                    <td><?php echo $reserva->nMascota?></td>
+                                    <td><span class="label label-success">
+                                        <?php
+                                            switch ($reserva->estado) {
+                                                case '0':
+                                                    echo "Proyectado";
+                                                    break;
+                                                case '1':
+                                                    echo "Hecho";
+                                                    break;
+                                                case '2': 
+                                                    echo "Postergado";   
+                                                    break;
+                                                case '3':
+                                                    echo "Suspendido";
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        ?>    
+                                            </span></td>
                                 </tr>
+                                <?php } ?>
                             </tbody>
                         </table>
                     </div>
@@ -94,27 +116,38 @@
                         <h4>Historial de Trabajos</h4>
                         <table class="table table-striped">
                             <tbody>
+                                <?php foreach ($historialReservas as $hreserva) {?>
                                 <tr>
-                                    <td><span class="label label-success">01/10/16</span></td>
-                                    <td>14:00</td>
-                                    <td>Corte</td>
-                                    <td>"Bobby"</td>
-                                    <td><span class="label label-success">Hecho</span></td>
+                                    <td><span class="label label-success"><?php echo $hreserva->fecha?></span></td>
+                                    <td><?php echo $hreserva->hora?></td>
+                                    <td><?php echo $hreserva->nArticulo?></td>
+                                    <td><?php echo $hreserva->nMascota?></td>
+                                    <td>
+                                        <?php
+                                            switch ($hreserva->estado) {
+                                                case '0':
+                                                    echo '<span class="label label-info">';
+                                                    echo "Proyectado";
+                                                    break;
+                                                case '1':
+                                                    echo '<span class="label label-success">';
+                                                    echo "Hecho";
+                                                    break;
+                                                case '2': 
+                                                    echo '<span class="label label-warning">';
+                                                    echo "Postergado";   
+                                                    break;
+                                                case '3':
+                                                    echo '<span class="label label-danger">';
+                                                    echo "Suspendido";
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        ?>    
+                                            </span></td>
                                 </tr>
-                                <tr>
-                                    <td><span class="label label-danger">10/10/16</span></td>
-                                    <td>14:00</td>
-                                    <td>Corte</td>
-                                    <td>"Bobby"</td>
-                                    <td><span class="label label-danger">Suspendido</span></td>
-                                </tr>
-                                <tr>
-                                    <td><span class="label label-warning">20/10/16</span></td>
-                                    <td>11:00</td>
-                                    <td>Corte</td>
-                                    <td>"Bobby"</td>
-                                    <td><span class="label label-warning">Postergado 31/10/16</span></td>
-                                </tr>
+                                <?php } ?>
                             </tbody>
                         </table>
                     </div>
