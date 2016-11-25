@@ -586,13 +586,18 @@ class Panel_controller extends CI_Controller {
     public function getMascotasJSON($idCliente){
         $data['mascotasJSON'] = $this->panel_model->buscarMascotas($idCliente);
         $this->load->view('reservas/getMascotas', $data);
-    }    
+    }
+    
+    /*public function getMascotasJSON(){
+        $data['mascotasJSON'] = $this->panel_model->listarMascotas();
+        $this->load->view('reservas/getMascotas', $data);
+    }*/
     
     public function getReservasJSON($fecha){
         $salida = str_replace('-', '/', $fecha);
         $data['reservasJSON'] = $this->panel_model->listarReservas($salida);
-        //$this->load->view('reservas/getReservas', $data);
-        echo json_encode($this->panel_model->listarReservas($salida));
+        $this->load->view('reservas/getReservas', $data);
+        //echo json_encode($this->panel_model->listarReservas($salida));
     }
     
     //Devuelve true o false y eso decide si se muestra el resto del form

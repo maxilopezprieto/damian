@@ -1,0 +1,1 @@
+<?php echo json_encode($reservasJSON, JSON_UNESCAPED_UNICODE );?>

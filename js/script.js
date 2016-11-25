@@ -1,7 +1,7 @@
 $(function() {
 
 	var instJSON = base_url(document.base_url) + "getClientesJSON";
-	var mascotasJSON = base_url(document.base_url) + "getMascotasJSON/" + $("#hInst").val();
+	
 
 	$("#autoInst").removeAttr("disabled");
 
@@ -17,7 +17,7 @@ $(function() {
 				success : function(data) {
 					var array = $.map(data, function(item) {
 						return {
-							label : item.id + " (" + item.nombre + ")",
+							label : item.id + " (" + item.nombre + ")" + " - "+item.direccion+"-",
 							value : item.id
 						};
 					});
@@ -25,7 +25,7 @@ $(function() {
 				}
 			});
 		},
-		minLength : 2,
+		minLength : 1,
 		select : function(event, ui) {
 			event.preventDefault();
 			$(this).val(ui.item.label);
@@ -47,37 +47,38 @@ $(function() {
 	});
 
 //Mascota
+	var mascotasJSON = base_url(document.base_url) + "getMascotasJSON";
 	$("#autoMasc").removeAttr("disabled");
 	$("#autoMasc").autocomplete({
 		source : function(request, response) {
 			$.ajax({
 				url : mascotasJSON,
-				type : "GET",
+				type : "POST",
 				dataType : "json",
 				data : {
-					term : $("#autoMasc").val()
+					term : $("#autoMasc").val() //Es el dato que va a mandar al controlador
 				},
 				success : function(data) {
-					var array = $.map(data, function(mascota) {
+					var array = $.map(data, function(item) {
 						return {
-							label : mascota.id + " (" + mascota.nmascota + ")",
-							value : mascota.id
+							label : item.id + " (" + item.mNombre + ")", //Es lo que devuelve
+							value : item.id
 						};
 					});
 					response($.ui.autocomplete.filter(array, request.term));
 				}
 			});
 		},
-		minLength : 4,
+		minLength : 2,
 		select : function(event, ui) {
 			event.preventDefault();
-			$(this).val(ui.mascota.label);
-			$("#hMasc").val(ui.mascota.value);
+			$(this).val(ui.item.label);
+			$("#hMasc").val(ui.item.value); //Es donde va a volcar los datos tal como viene del return de ajax
 		},
 		change : function(event, ui) {
-			if (ui.mascota == null || ui.mascota == undefined) {
+			if (ui.item == null || ui.item == undefined) {
 				$(this).val("");
-				$("#hMasc").val("");
+				$("#hMasc").val(""); //Es donde va a volcar los datos tal como viene del return de ajax
 			}
 		}
 	});
@@ -92,7 +93,8 @@ $(function() {
 //DATEPICKER
 	var salida = $("#datetimepicker").val().replace("/", "-");
 	var res = salida.slice(0,9);
-	var reservasJSON = base_url(document.base_url) + "getReservasJSON/" + res;
+	//var getReservasJSON = base_url(document.base_url) + "getReservasJSON/" + res;
+	var getReservasJSON = res;
 	$('#datetimepicker').blur(function() {
 
 		var $this = $(this);
@@ -101,9 +103,28 @@ $(function() {
 
 		$this.addClass("ui-autocomplete-loading");
 
-		$.ajax({
-			type : "POST",
-			url : reservasJSON,
+			$.ajax({
+				url : getReservasJSON,
+				type : "GET",
+				dataType : "json",
+				data : {
+					term : salida.slice(0,9)
+				},
+				success : function(data) {
+					var array = $.map(data, function(reserva) {
+						return {
+							label : reserva.id + " (" + reserva.nCliente + ")",
+							value : reserva.id
+						};
+					});
+					response($.ui.autocomplete.filter(array, request.term));
+				}
+			});
+
+
+		/*$.ajax({
+			type : "GET",
+			url : getReservasJSON,
 			data : dataString,
 			dataType : "json",
 			success : function(data) {
@@ -116,7 +137,7 @@ $(function() {
 					$(".form-remove").slideDown(500);
 				}
 			}
-		});
+		});*/
 	});
 
 	$('#dni').focus(function() {

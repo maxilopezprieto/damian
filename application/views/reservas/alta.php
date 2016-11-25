@@ -18,6 +18,8 @@
                             <div class="modal-footer" style="width: 350px">
                                 <input class="btn btn-default" type="submit" value="Ver Reservas" />
                             </div>
+                            <label id="reservaDe"></label>
+                            
 
             <div class="form-group">
                 <label for="autoInst">Cliente:</label>
