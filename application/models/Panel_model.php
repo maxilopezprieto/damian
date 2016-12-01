@@ -81,7 +81,7 @@ class Panel_model extends CI_Model {
         $this->db->where('mascota.idRaza = raza.id');
         $consulta = $this->db->get();
         return $consulta->result(); 
-    }
+    }  
     
     public function buscarVentas($idCliente){
         $this->db->select('ventas.id, ventas.idCliente, articulos.nombre as nArticulo, ventas.fecha, ventas.cantidad, articulos.precio as precio');

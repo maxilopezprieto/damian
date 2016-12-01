@@ -1,6 +1,5 @@
 $(function() {
 	var instJSON = base_url(document.base_url) + "getClientesJSON"; //Variable con la URL del action
-	var it_works;
 	$("#autoInst").removeAttr("disabled"); //Al principio figura como DISABLED y esto lo activa. No se por que
 	$("#autoInst").autocomplete({ //Le dice que a lo q se llama autoInst lo va a autocompletar con lo q sigue
 		source : function(request, response) {
@@ -32,15 +31,13 @@ $(function() {
 			$("#id").html(ui.item.value);
 			$("#nombre").html(ui.item.nombre);
 			$("#direccion").html(ui.item.direccion);
-			//TEST
 			var mascotasJSON = base_url(document.base_url) + 'getMascotasClienteJSON?idCliente=';
 			$(".selector-mascota select").empty();
 			$.getJSON(mascotasJSON+$(".cliente-id").text(),function(data){
 			    $.each(data, function(id,value){
-				$(".selector-mascota select").append('<option value="'+id+'">'+value.nMascota+'</option>');
+				$(".selector-mascota select").append('<option value="'+value.idCliente+'">'+value.nMascota+'</option>');
 			    });
-			});		
-			//FIN TEST
+			});
 		},
 		change : function(event, ui) {
 			if (ui.item == null || ui.item == undefined) {
@@ -56,60 +53,15 @@ $(function() {
 		}
 	});
 
-//Mascota
-var cliente;
-	var mascotasJSON = base_url(document.base_url) + 'getMascotasClienteJSON?idCliente=' + cliente;
-	alert(mascotasJSON);
-	$("#autoMasc").removeAttr("disabled");
-	$("#autoMasc").autocomplete({
-		source : function(request, response) {
-			$.ajax({
-				url : mascotasJSON,
-				type : "GET",
-				dataType : "json",
-				data: {term: $("#autoMasc").val()}, //Es el dato por el que va a filtrar
-				success : function(data) {
-					var array = $.map(data, function(item) {
-						return {
-							label : item.mNombre, //Es lo que devuelve
-							value : item.mNombre
-						};
-					});
-					response($.ui.autocomplete.filter(array, request.term));
-				}
-			});
-		},
-		minLength : 2,
-		select : function(event, ui) {
-			event.preventDefault();
-			$(this).val(ui.item.label);
-			$("#hMasc").val(ui.item.value); //Es donde va a volcar los datos tal como viene del return de ajax
-		},
-		change : function(event, ui) {
-			if (ui.item == null || ui.item == undefined) {
-				$(this).val("");
-				$("#hMasc").val(""); //Es donde va a volcar los datos tal como viene del return de ajax. Es hiden
-			}
-		}
+$(".selector-mascota select").change(function() {
+	$.getJSON('buscarMascotaJSON?idMascota='+$(".selector-mascota select").val(),function(data){
+		$.each(data, function(id,value){
+		$("#nMascota").html(value.nMascota);
+		$("#nRaza").html(value.nRaza);
+		$("#obs").html(value.obs);
+		});
 	});
-
-	$("form").submit(function() {
-		if ($("autoMasc").val() == "") {
-			e.preventDefault();
-		}
-
-	});
-//FIN Mascota
-
-
-
-
-
-
-
-
-
-
+});
 
 //DATEPICKER
 	var salida = $("#datetimepicker").val().replace("/", "-");
