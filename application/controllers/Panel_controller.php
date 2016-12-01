@@ -583,10 +583,16 @@ class Panel_controller extends CI_Controller {
         $this->load->view('reservas/getClientes', $data);
     }    
     
-    public function getMascotasJSON($idCliente){
-        $data['mascotasJSON'] = $this->panel_model->buscarMascotas($idCliente);
+    public function getMascotasJSON(){
+        $data['mascotasJSON'] = $this->panel_model->listarMascotas();
         $this->load->view('reservas/getMascotas', $data);
     }
+	
+    public function getMascotasClienteJSON(){
+    	$idCliente = $this->input->get('idCliente');
+        $data['mascotasJSON'] = $this->panel_model->buscarMascotas($idCliente);
+        $this->load->view('reservas/getMascotas', $data);
+    }	
     
     /*public function getMascotasJSON(){
         $data['mascotasJSON'] = $this->panel_model->listarMascotas();

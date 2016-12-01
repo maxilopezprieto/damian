@@ -1,27 +1,25 @@
 $(function() {
-
-	var instJSON = base_url(document.base_url) + "getClientesJSON";
-	
-
-	$("#autoInst").removeAttr("disabled");
-
-	$("#autoInst").autocomplete({
+	var instJSON = base_url(document.base_url) + "getClientesJSON"; //Variable con la URL del action
+	$("#autoInst").removeAttr("disabled"); //Al principio figura como DISABLED y esto lo activa. No se por que
+	$("#autoInst").autocomplete({ //Le dice que a lo q se llama autoInst lo va a autocompletar con lo q sigue
 		source : function(request, response) {
 			$.ajax({
-				url : instJSON,
-				type : "GET",
-				dataType : "json",
-				data : {
+				url : instJSON, //Donde apunta
+				type : "GET", //Método de envpio
+				dataType : "json", //Valor que espera recibir
+				data : { //Dato que va a enviar-> variable: valor (en este caso tomado del campo que empecé a escribir)
 					term : $("#autoInst").val()
 				},
-				success : function(data) {
-					var array = $.map(data, function(item) {
+				success : function(data) { //En el caso de éxito:
+					var array = $.map(data, function(item) { //La respuesta es un JSON completo
 						return {
-							label : item.id + " (" + item.nombre + ")" + " - "+item.direccion+"-",
-							value : item.id
+							label : item.id,
+							value : item.id,
+							nombre : item.nombre,
+							direccion : item.direccion
 						};
 					});
-					response($.ui.autocomplete.filter(array, request.term));
+					response($.ui.autocomplete.filter(array, request.term)); //El valor que retorna
 				}
 			});
 		},
@@ -30,39 +28,45 @@ $(function() {
 			event.preventDefault();
 			$(this).val(ui.item.label);
 			$("#hInst").val(ui.item.value);
+			$("#id").html(ui.item.value);
+			$("#nombre").html(ui.item.nombre);
+			$("#direccion").html(ui.item.direccion);
 		},
 		change : function(event, ui) {
 			if (ui.item == null || ui.item == undefined) {
 				$(this).val("");
 				$("#hInst").val("");
+				$("#hInst2").html("");
 			}
 		}
 	});
-
 	$("form").submit(function() {
 		if ($("autoInst").val() == "") {
 			e.preventDefault();
 		}
-
 	});
 
+/*Para selector
+ * El evento disparador será el cambio en el campo autoInst (cliente)
+ * Pide al php enviando 'archivo.php?idCliente='+$(".autoInst").val()
+ */
+
 //Mascota
-	var mascotasJSON = base_url(document.base_url) + "getMascotasJSON";
+	var cliente = $("#id").val();
+	var mascotasJSON = base_url(document.base_url) + 'getMascotasClienteJSON?idCliente=' + cliente;
 	$("#autoMasc").removeAttr("disabled");
 	$("#autoMasc").autocomplete({
 		source : function(request, response) {
 			$.ajax({
 				url : mascotasJSON,
-				type : "POST",
+				type : "GET",
 				dataType : "json",
-				data : {
-					term : $("#autoMasc").val() //Es el dato que va a mandar al controlador
-				},
+				data: {term: $("#autoMasc").val()}, //Es el dato por el que va a filtrar
 				success : function(data) {
 					var array = $.map(data, function(item) {
 						return {
-							label : item.id + " (" + item.mNombre + ")", //Es lo que devuelve
-							value : item.id
+							label : item.mNombre, //Es lo que devuelve
+							value : item.mNombre
 						};
 					});
 					response($.ui.autocomplete.filter(array, request.term));
@@ -78,7 +82,7 @@ $(function() {
 		change : function(event, ui) {
 			if (ui.item == null || ui.item == undefined) {
 				$(this).val("");
-				$("#hMasc").val(""); //Es donde va a volcar los datos tal como viene del return de ajax
+				$("#hMasc").val(""); //Es donde va a volcar los datos tal como viene del return de ajax. Es hiden
 			}
 		}
 	});
@@ -90,6 +94,17 @@ $(function() {
 
 	});
 //FIN Mascota
+
+
+
+
+
+
+
+
+
+
+
 //DATEPICKER
 	var salida = $("#datetimepicker").val().replace("/", "-");
 	var res = salida.slice(0,9);

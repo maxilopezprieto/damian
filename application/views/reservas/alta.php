@@ -25,6 +25,12 @@
                 <label for="autoInst">Cliente:</label>
                 <input required="required" class="form-control form-required ui-autocomplete-input" id="autoInst" type="text" name="autoInst" placeholder="Comience a escribir..." autocomplete="off" disabled="disabled"/>
                 <input id="hInst" name="cliente" type="hidden" value=""/>
+                <div id="id" name="id"></div>
+                <div id="nombre" name="nombre"></div>
+                <div id="direccion" name="direccion"></div>
+                <!--<button type="button" id="getMascota" name="getMascota" class="btn btn-primary">Primary</button>-->
+                <div id="idMascota" name="idMascota"></div>
+                <div id="nombreMascota" name="nombreMascota"></div>
             </div>
             
             <div class="form-group">
@@ -32,6 +38,11 @@
                 <input required="required" class="form-control form-required ui-autocomplete-input" id="autoMasc" type="text" name="autoMasc" placeholder="Comience a escribir..." autocomplete="off" disabled="disabled"/>
                 <input id="hMasc" name="mascota" type="hidden" value=""/>
             </div>
+            
+            <div class="autoMasc2">
+     			Mascota:
+     		<select></select>
+</div>
                     </form>
             </div>
         </div>
