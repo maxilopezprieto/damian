@@ -1,5 +1,6 @@
 $(function() {
 	var instJSON = base_url(document.base_url) + "getClientesJSON"; //Variable con la URL del action
+	var it_works;
 	$("#autoInst").removeAttr("disabled"); //Al principio figura como DISABLED y esto lo activa. No se por que
 	$("#autoInst").autocomplete({ //Le dice que a lo q se llama autoInst lo va a autocompletar con lo q sigue
 		source : function(request, response) {
@@ -31,6 +32,15 @@ $(function() {
 			$("#id").html(ui.item.value);
 			$("#nombre").html(ui.item.nombre);
 			$("#direccion").html(ui.item.direccion);
+			//TEST
+			var mascotasJSON = base_url(document.base_url) + 'getMascotasClienteJSON?idCliente=';
+			$(".selector-mascota select").empty();
+			$.getJSON(mascotasJSON+$(".cliente-id").text(),function(data){
+			    $.each(data, function(id,value){
+				$(".selector-mascota select").append('<option value="'+id+'">'+value.nMascota+'</option>');
+			    });
+			});		
+			//FIN TEST
 		},
 		change : function(event, ui) {
 			if (ui.item == null || ui.item == undefined) {
@@ -46,14 +56,10 @@ $(function() {
 		}
 	});
 
-/*Para selector
- * El evento disparador será el cambio en el campo autoInst (cliente)
- * Pide al php enviando 'archivo.php?idCliente='+$(".autoInst").val()
- */
-
 //Mascota
-	var cliente = $("#id").val();
+var cliente;
 	var mascotasJSON = base_url(document.base_url) + 'getMascotasClienteJSON?idCliente=' + cliente;
+	alert(mascotasJSON);
 	$("#autoMasc").removeAttr("disabled");
 	$("#autoMasc").autocomplete({
 		source : function(request, response) {

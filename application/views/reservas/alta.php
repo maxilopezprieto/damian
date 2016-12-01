@@ -25,9 +25,24 @@
                 <label for="autoInst">Cliente:</label>
                 <input required="required" class="form-control form-required ui-autocomplete-input" id="autoInst" type="text" name="autoInst" placeholder="Comience a escribir..." autocomplete="off" disabled="disabled"/>
                 <input id="hInst" name="cliente" type="hidden" value=""/>
-                <div id="id" name="id"></div>
+                <div id="id" class="cliente-id" name="id">sss</div>
                 <div id="nombre" name="nombre"></div>
                 <div id="direccion" name="direccion"></div>
+                <!--<button type="button" id="getMascota" name="getMascota" class="btn btn-primary">Primary</button>-->
+                <div id="idMascota" name="idMascota"></div>
+                <div id="nombreMascota" name="nombreMascota"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="selector-mascota">Mascota Select:</label>
+                <div class="selector-mascota">
+                     Elija una Mascota
+                     <select></select>
+                </div>
+                <input id="idInput" name="cliente" type="hidden" value=""/>
+                <div id="idCliente" name="id"></div>
+                <div id="nombreCliente" name="nombre"></div>
+                <div id="direccionCliente" name="direccion"></div>
                 <!--<button type="button" id="getMascota" name="getMascota" class="btn btn-primary">Primary</button>-->
                 <div id="idMascota" name="idMascota"></div>
                 <div id="nombreMascota" name="nombreMascota"></div>
