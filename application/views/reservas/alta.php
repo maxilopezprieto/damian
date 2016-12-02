@@ -15,10 +15,30 @@
                                 <label for="datetime">Seleccione fecha</label>
                                 <input type="text" class="form-control" id="datetimepicker" name="datetime" placeholder="Fecha y Hora value="<?php echo set_value('nombre'); ?>">
                             </div>
-                            <div class="modal-footer" style="width: 350px">
-                                <input class="btn btn-default" type="submit" value="Ver Reservas" />
-                            </div>
-                            <label id="reservaDe"></label>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Mascota</th>
+                            <th>Trabajo</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th class="col-sm-3"></th>
+                        </tr>
+                    </thead> 
+                    <tbody>
+                        <tr>
+                            <th id="clientet"></th>
+                            <th id="nMascotat"></th>
+                            <th id="nArticulot"></th>
+                            <th id="fechat"></th>
+                            <th id="horat"></th>
+                            <th class="col-sm-3"></th>                           
+                        </tr>
+                    </tbody>                   
+                </table>
+            </div>
                             
 
             <div class="form-group">

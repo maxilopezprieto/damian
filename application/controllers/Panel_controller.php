@@ -600,31 +600,14 @@ class Panel_controller extends CI_Controller {
         $this->load->view('reservas/getMascotas', $data);
     }	
     
-    /*public function getMascotasJSON(){
-        $data['mascotasJSON'] = $this->panel_model->listarMascotas();
-        $this->load->view('reservas/getMascotas', $data);
-    }*/
     
-    public function getReservasJSON($fecha){
-        $salida = str_replace('-', '/', $fecha);
-        $data['reservasJSON'] = $this->panel_model->listarReservas($salida);
+    public function getReservasJSON(){
+        $fecha = $this->input->get('fecha');
+        //$salida = str_replace('-', '/', $fecha);
+        $data['reservasJSON'] = $this->panel_model->listarReservas($fecha);
+        //print_r ($data['reservasJSON']);
         $this->load->view('reservas/getReservas', $data);
-        //echo json_encode($this->panel_model->listarReservas($salida));
     }
-    
-    //Devuelve true o false y eso decide si se muestra el resto del form
-    /*public function getDNI(){
-        sleep(1);
-        if ($_REQUEST){
-            $dni = $_REQUEST['dni'];
-            $resultado = $this->formulario_model->buscarGenerico('dni', 'docentes',$dni);
-            if (!empty($resultado)){
-                echo json_encode(array("re"=>TRUE));
-            }else{
-                echo json_encode(array("re"=>FALSE));
-            }
-        }
-    }*/
     
     public function reservas(){
         $this->control();
@@ -646,20 +629,7 @@ class Panel_controller extends CI_Controller {
         $this->load->view("header");
         $this->load->view("nav");
         $this->load->view("reservas/alta", $data);
-        $this->load->view("footer");
-                
-        //Paso 1: Seleccionar Fecha (post fecha)
-        
-        if ($this->input->post('datetime')){
-            $fecha = explode(" ", $this->input->post('datetime'));
-            $hora = $fecha[1];
-            $fecha = $fecha[0];
-            $data['reservas'] = $this->panel_model->listarReservas($fecha);
-        }
-        //Paso 2: Mostrar reservas de la fecha. Botón siguiente o elegir otra fecha
-        //Paso 3: Seleccionar cliente y trabajo (post cliente, post trabajo)
-        //Paso 4: Seleccionar mascota. Guardar (post mascota)
-             
+        $this->load->view("footer");       
     }
     
 //-ALTA

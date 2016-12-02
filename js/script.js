@@ -39,7 +39,7 @@ $(function() {
 			$(".selector-mascota select").append('<option value="">Seleccione</option>');
 			$.getJSON(mascotasJSON+$(".cliente-id").text(),function(data){
 			    $.each(data, function(id,value){
-				$(".selector-mascota select").append('<option value="'+value.id+'">'+value.nMascota+'</option>');
+					$(".selector-mascota select").append('<option value="'+value.id+'">'+value.nMascota+'</option>');
 			    });
 			});
 		},
@@ -58,7 +58,7 @@ $(function() {
 	});
 
 	$(".selector-mascota select").change(function() {
-		$.getJSON('buscarMascotaJSON?idMascota='+$(".selector-mascota select").val(),function(value){
+		$.getJSON(base_url(document.base_url) + 'buscarMascotaJSON?idMascota='+$(".selector-mascota select").val(),function(value){
 			$("#nMascota").empty();
 			$("#nRaza").empty();
 			$("#obs").empty();
@@ -67,70 +67,33 @@ $(function() {
 			$("#obs").html(value.obs);
 		});
 	});
-
-//DATEPICKER
-	var salida = $("#datetimepicker").val().replace("/", "-");
-	var res = salida.slice(0,9);
-	//var getReservasJSON = base_url(document.base_url) + "getReservasJSON/" + res;
-	var getReservasJSON = res;
-	$('#datetimepicker').blur(function() {
-
-		var $this = $(this);
-		var fecha = $this.val();
-		var dataString = 'fecha=' + fecha;
-
-		$this.addClass("ui-autocomplete-loading");
-
-			$.ajax({
-				url : getReservasJSON,
-				type : "GET",
-				dataType : "json",
-				data : {
-					term : salida.slice(0,9)
-				},
-				success : function(data) {
-					var array = $.map(data, function(reserva) {
-						return {
-							label : reserva.id + " (" + reserva.nCliente + ")",
-							value : reserva.id
-						};
-					});
-					response($.ui.autocomplete.filter(array, request.term));
-				}
-			});
-
-
-		/*$.ajax({
-			type : "GET",
-			url : getReservasJSON,
-			data : dataString,
-			dataType : "json",
-			success : function(data) {
-				console.log(data);
-				$this.removeClass("ui-autocomplete-loading");
-				if (data.re) {
-					$this.addClass("validation-ok");
-					$(".form-required").removeAttr("required");
-				} else {
-					$(".form-remove").slideDown(500);
-				}
-			}
-		});*/
-	});
-
-	$('#dni').focus(function() {
-		$(this).removeClass("validation-ok");
-		$(".form-remove").slideUp(500);
-		$(".form-required").attr("required", "required");
-	});
-
 });
 
+	$("#datetimepicker").blur(function() {
+			var salida = $("#datetimepicker").val().replace("///g", "-");
+			var res = salida.slice(0,10);
+			var envio = 'getReservasJSON?fecha='+res;
+			$.getJSON(base_url(document.base_url) + envio, function(data){
+			    $.each(data, function(id,value){ //Tira el último, debe generar cada fila
+					$("#clientet").html(value.nCliente);
+					$("#nMascotat").html(value.nMascota);
+					$("#nArticulot").html(value.nArticulo);
+					$("#fechat").html(value.fecha);
+					$("#horat").html(value.hora);
+			    });
+			});
+	});
+	
+	$("#datetimepicker").change(function () {
+					$("#clientet").empty();
+					$("#nMascotat").empty();
+					$("#nArticulot").empty();
+					$("#fechat").empty();
+					$("#horat").empty();		
+	});
+
 function base_url(segment) {
-	// get the segments
 	pathArray = window.location.pathname.split('/');
-	// find where the segment is located
 	indexOfSegment = pathArray.indexOf(segment);
-	// make base_url be the origin plus the path to the segment
 	return window.location.origin + pathArray.slice(0, indexOfSegment).join('/') + '/';
 }   
