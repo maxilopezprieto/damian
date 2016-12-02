@@ -36,7 +36,7 @@
                 <label for="selector-mascota">Seleccionar Mascota:</label>
                 <div class="selector-mascota">
                      Elija una Mascota
-                     <select></select>
+                     <select><option value="0">Seleccione un cliente</option></select>
                 </div>
                 <input id="idInput" name="cliente" type="hidden" value=""/>
                 <div id="nMascota" name="nMascota"></div>

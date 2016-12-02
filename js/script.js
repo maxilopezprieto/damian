@@ -27,15 +27,19 @@ $(function() {
 		select : function(event, ui) {
 			event.preventDefault();
 			$(this).val(ui.item.label);
+			$("#nMascota").empty();
+			$("#nRaza").empty();
+			$("#obs").empty();
 			$("#hInst").val(ui.item.value);
 			$("#id").html(ui.item.value);
 			$("#nombre").html(ui.item.nombre);
 			$("#direccion").html(ui.item.direccion);
 			var mascotasJSON = base_url(document.base_url) + 'getMascotasClienteJSON?idCliente=';
 			$(".selector-mascota select").empty();
+			$(".selector-mascota select").append('<option value="">Seleccione</option>');
 			$.getJSON(mascotasJSON+$(".cliente-id").text(),function(data){
 			    $.each(data, function(id,value){
-				$(".selector-mascota select").append('<option value="'+value.idCliente+'">'+value.nMascota+'</option>');
+				$(".selector-mascota select").append('<option value="'+value.id+'">'+value.nMascota+'</option>');
 			    });
 			});
 		},
@@ -53,15 +57,16 @@ $(function() {
 		}
 	});
 
-$(".selector-mascota select").change(function() {
-	$.getJSON('buscarMascotaJSON?idMascota='+$(".selector-mascota select").val(),function(data){
-		$.each(data, function(id,value){
-		$("#nMascota").html(value.nMascota);
-		$("#nRaza").html(value.nRaza);
-		$("#obs").html(value.obs);
+	$(".selector-mascota select").change(function() {
+		$.getJSON('buscarMascotaJSON?idMascota='+$(".selector-mascota select").val(),function(value){
+			$("#nMascota").empty();
+			$("#nRaza").empty();
+			$("#obs").empty();
+			$("#nMascota").html(value.nMascota);
+			$("#nRaza").html(value.nRaza);
+			$("#obs").html(value.obs);
 		});
 	});
-});
 
 //DATEPICKER
 	var salida = $("#datetimepicker").val().replace("/", "-");
